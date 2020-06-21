@@ -40,7 +40,7 @@ empty
 (define pt2_t (point_t 1 2))
 (equal? pt1_t pt2_t) ;; now gives true
 (eq? pt1_t pt2_t)
-(define pt3_t pt1_t)
+(define pt3_t pt1_t) ;; actually makes pt3_t a reference to pt1_t
 (eq? pt3_t pt1_t) ;; gives true because pt3_t is indeed pt1_t
 #| While equal? checks whether two values consist of identical pieces (in terms of values),
 eq? compares whether changing one structure changes the other structure (aka references (or pointers)),
@@ -108,7 +108,18 @@ and that happens only when the structures were created with the same exact call 
 (filter (lambda (x) ( > x 1)) '(1 2 3)) ;; using map-filter rather than myfilter
 (lambda (x) (+ x 1)) ;; gives #<procedure> in interpreter
 ((lambda (x) (+ x 1)) 1) ;; hence the function has been evaluated on 1
-
+((lambda x x) 1 2 3) ;; note initial argument x is without () hence represents rest argument that is there can be any number of arguments which are stored in x as list
+((lambda (x . y) y) '(1 2) 3 4) ;; Hence requires atleast one argument for x and all other are stored in y
 ;; other HOF are ormap, andmap, foldr
 (apply max '(1 2 3 4 5)) ;; apply applies operator to all elements of list giving a cumulated answer
 (apply + '(1 2 3 4 5))
+;; Mutable Structs
+(println "Mutatable Structs")
+(struct points (x y) #:mutable #:transparent) ;mutable as put in this makes whole struct mutable whereas independent fields can be meade mutable as (struct points ([x #:mutable] y))
+(struct golden_points points (name)) ;; inheritance of the above
+(define gp1 (golden_points 1 2 'apoorv)) ;; first comes the fields of the parent class then the current class
+(points-x gp1)
+(points-y gp1)
+(golden_points-name gp1)
+(set-points-x! gp1 4) ;; note with #:mutable we have set function (called mutator) automatically built by Racket
+(points-x gp1)
